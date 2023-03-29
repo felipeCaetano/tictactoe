@@ -16,6 +16,7 @@ class Game:
         self.pos = None
         self.clicks = 0
         self.player = 1
+        self.game_over = None
 
     def create_board(self):
         self.screen.fill(BG_COLOR)
@@ -44,16 +45,40 @@ class Game:
             pos_x += 1
 
     def check_victory(self):
-        print('verificando vencedor')
+        y_pos = 0
+        # vertical check
         for line in self.markers:
             if sum(line) == 3:
                 print("player 1 Wins!")
-                # self.running = False
+                self.game_over = True
                 break
             elif sum(line) == -3:
                 print("player 2 Wins!")
-                # self.running = False
+                self.game_over = True
                 break
+            # horizontal check
+            if self.markers[0][y_pos] + self.markers[1][y_pos] + self.markers[2][y_pos] == 3:
+                print("player 1 Wins!")
+                self.game_over = True
+                break
+            elif self.markers[0][y_pos] + self.markers[1][y_pos] + self.markers[2][y_pos] == -3:
+                print("player 2 Wins!")
+                self.game_over = True
+                break
+            # diagonal check
+            if self.markers[0][0] + self.markers[1][1] +\
+                    self.markers[2][2] == 3 or self.markers[0][2] + self.markers[1][1] +\
+                    self.markers[2][0] == 3:
+                print("player 1 Wins!")
+                self.game_over = True
+                break
+            elif self.markers[0][0] + self.markers[1][1] +\
+                    self.markers[2][2] == -3 or self.markers[0][2] + self.markers[1][1] +\
+                    self.markers[2][0] == -3:
+                print("player 2 Wins!")
+                self.game_over = True
+                break
+            y_pos += 1
 
     def run(self):
         self.create_board()
@@ -66,17 +91,11 @@ class Game:
                         self.pos = pygame.mouse.get_pos()
                         p_x, p_y = self.pos
                         if self.markers[p_x//166][p_y//166] == 0:
-                            if self.player == 1:
-                                self.markers[p_x // 166][p_y // 166] = 1
-                                self.player = 2
-                            else:
-                                self.markers[p_x // 166][p_y // 166] = -1
-                                self.player = 1
+                            self.markers[p_x // 166][p_y // 166] = self.player
+                            self.player *= -1
                             self.draw_marks()
                             self.clicks += 1
-                        else:
-                            pass
-                        if self.clicks >= 5:
+                        if self.clicks >= 4:
                             self.check_victory()
             self.clock.tick(60)
             pygame.display.update()
